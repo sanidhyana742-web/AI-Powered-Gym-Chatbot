@@ -1,0 +1,36 @@
+{
+    "sanidhya": {
+        "password": "Sanidhya@2005",
+        "email": "sanidhyana742@gmail.com",
+        "age": 21,
+        "weight": 52.0,
+        "height": 220.0,
+        "goal": "weight loss",
+        "activity_level": "moderate",
+        "created_at": "2026-04-06T11:57:16.092671",
+        "favorite_exercises": [
+            "squat"
+        ],
+        "dietary_restrictions": [
+            "vegeterian"
+        ],
+        "injury_history": [],
+        "availability": "anytime",
+        "preferred_workout_type": "mixed",
+        "past_goals": [],
+        "motivational_keywords": [
+            "strength"
+        ],
+        "profile_memory_updated": "2026-04-06T13:45:46.532858"
+    },
+    "sanket phad": {
+        "password": "sanket",
+        "email": "s@gmail.com",
+        "age": 0,
+        "weight": 0,
+        "height": 0,
+        "goal": "general fitness",
+        "activity_level": "moderate",
+        "created_at": "2026-09-12T11:23:29.323349"
+    }
+}

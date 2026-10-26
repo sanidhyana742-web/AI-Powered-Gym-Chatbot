@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fitness Coach - Chat</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/chat-widget.css">
+    <style>
+        .chat-body {
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(8, 13, 26, 0.76), rgba(8, 13, 26, 0.9)),
+                url("https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1600&q=80") center/cover fixed;
+        }
+
+        .chat-header {
+            padding-bottom: 18px;
+        }
+
+        .feature-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .feature-link {
+            display: block;
+            padding: 16px;
+            border-radius: 18px;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #f8fafc;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .feature-link:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 107, 107, 0.45);
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
+        }
+
+        .feature-link strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+
+        .feature-link span {
+            display: block;
+            color: #bac7d7;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .voice-btn {
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 5px;
+            transition: all 0.3s;
+        }
+
+        .voice-btn:hover {
+            background: #ff5252;
+        }
+
+        .voice-btn.listening {
+            background: #4caf50;
+            animation: pulse 1s infinite;
+        }
+
+        .workout-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .workout-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            width: min(100%, 520px);
+            background: #fff;
+            padding: 28px;
+            border-radius: 18px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #182235;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #ff6b6b;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body class="chat-body">
+    <nav class="nav">
+        <div class="logo">FitnessAI</div>
+        <a href="/dashboard" class="btn-nav">Dashboard</a>
+        <a href="/calculator" class="btn-nav">Calculators</a>
+        <a href="/posture" class="btn-nav">Posture</a>
+        <a href="/workout-timer" class="btn-nav">Timer</a>
+        <a href="/personality-mode" class="btn-nav">Personality</a>
+        <a href="/mood-workout" class="btn-nav">Mood Workout</a>
+        <a href="/achievements" class="btn-nav">Achievements</a>
+        <a href="/logout" class="btn-nav">Logout</a>
+    </nav>
+
+    <div class="chat-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Quick Tools</h2>
+            </div>
+
+            <div class="profile-section">
+                <h3>Profile</h3>
+                <div class="input-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" placeholder="Enter your age" value="25">
+                </div>
+                <div class="input-group">
+                    <label for="goal">Fitness Goal</label>
+                    <select id="goal">
+                        <option value="weight loss">Weight Loss</option>
+                        <option value="muscle gain">Muscle Gain</option>
+                        <option value="general fitness">General Fitness</option>
+                        <option value="endurance">Endurance</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h3>Features</h3>
+                <button class="action-btn" onclick="showWorkoutModal()">Workout</button>
+                <button class="action-btn" onclick="showMealPlanModal()">Meal Plan</button>
+                <button class="action-btn" onclick="generateTips()">Tips</button>
+                <button class="action-btn" onclick="goToCalculator()">Calculators</button>
+                <button class="action-btn" onclick="goToTimer()">Timer</button>
+                <button class="action-btn" onclick="goToPersonality()">Personality</button>
+                <button class="action-btn" onclick="goToMoodWorkout()">Mood Workout</button>
+                <button class="action-btn" onclick="goToAchievements()">Achievements</button>
+            </div>
+
+            <div class="profile-section">
+                <h3>History</h3>
+                <button class="action-btn" onclick="loadChatHistory()">Load History</button>
+                <button class="action-btn" onclick="clearChatHistory()">Clear Chat</button>
+            </div>
+        </aside>
+
+        <div class="chat-wrapper">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>AI Fitness Coach</h2>
+                    <p id="info-text">Your new pages are linked here and visible in both the navbar and the chatbot header.</p>
+                    <div class="feature-strip">
+                        <a href="/personality-mode" class="feature-link">
+                            <strong>Personality Mode</strong>
+                            <span>Change how the chatbot speaks and coaches you.</span>
+                        </a>
+                        <a href="/mood-workout" class="feature-link">
+                            <strong>Mood Workout</strong>
+                            <span>Generate training based on your current energy and mood.</span>
+                        </a>
+                        <a href="/achievements" class="feature-link">
+                            <strong>Achievements</strong>
+                            <span>See badge progress, points, and unlock history.</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="chat-box" class="chat-box"></div>
+
+                <div class="input-area">
+                    <input type="text" id="user-input" placeholder="Ask your AI coach anything about fitness, workouts, recovery, or nutrition">
+                    <button onclick="sendMessage()" title="Send message">Send</button>
+                    <button class="voice-btn" id="voice-btn" onclick="toggleVoiceInput()" title="Voice input">Mic</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="workout-modal" class="workout-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeWorkoutModal()">&times;</span>
+            <h2>Smart Workout Generator</h2>
+            <div class="input-group">
+                <label for="workout-duration">Duration (minutes)</label>
+                <input type="number" id="workout-duration" value="30" min="10" max="180">
+            </div>
+            <div class="input-group">
+                <label for="workout-equipment">Equipment Available</label>
+                <select id="workout-equipment">
+                    <option value="none">No Equipment (Bodyweight)</option>
+                    <option value="dumbbells">Dumbbells</option>
+                    <option value="barbell">Barbell and Plates</option>
+                    <option value="gym">Full Gym</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="workout-experience">Experience Level</label>
+                <select id="workout-experience">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+            <button class="action-btn" onclick="generateWorkout()" style="width: 100%;">Generate Workout</button>
+        </div>
+    </div>
+
+    <div id="meal-modal" class="workout-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeMealPlanModal()">&times;</span>
+            <h2>Meal Plan Generator</h2>
+            <div class="input-group">
+                <label for="meal-calories">Daily Calories</label>
+                <input type="number" id="meal-calories" value="2000" min="1000" max="5000" step="100">
+            </div>
+            <div class="input-group">
+                <label for="meal-preference">Dietary Preference</label>
+                <select id="meal-preference">
+                    <option value="no restriction">No Restriction</option>
+                    <option value="vegetarian">Vegetarian</option>
+                    <option value="vegan">Vegan</option>
+                    <option value="keto">Keto</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="meal-days">Number of Days</label>
+                <input type="number" id="meal-days" value="7" min="1" max="30">
+            </div>
+            <button class="action-btn" onclick="generateMealPlan()" style="width: 100%;">Generate Meal Plan</button>
+        </div>
+    </div>
+
+    <script src="/static/chat-widget.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+</html>

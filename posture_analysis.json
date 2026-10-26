@@ -1,0 +1,104 @@
+{
+    "sanidhya": [
+        {
+            "score": 20,
+            "overall": "Poor posture - significant adjustments needed",
+            "feedback": [
+                "\u2713 Overall posture looks good"
+            ],
+            "issues": [
+                "Spine misalignment - appear hunched or leaning",
+                "Body leaning - stand more upright and centered",
+                "Uneven shoulders - align shoulders level",
+                "Head leaning forward - keep head over shoulders"
+            ],
+            "timestamp": "2026-04-06T12:31:31.964025",
+            "method": "Advanced body contour analysis"
+        },
+        {
+            "score": 60,
+            "overall": "Fair posture - multiple adjustments recommended",
+            "feedback": [
+                "\u2713 Good body centering",
+                "\u2713 Head position is neutral"
+            ],
+            "issues": [
+                "Spine misalignment - appear hunched or leaning",
+                "Uneven shoulders - align shoulders level"
+            ],
+            "timestamp": "2026-04-06T12:32:07.595575",
+            "method": "Advanced body contour analysis"
+        },
+        {
+            "score": 75,
+            "overall": "Good posture - minor adjustments needed",
+            "feedback": [
+                "\u2713 Good body centering",
+                "\u2713 Shoulders appear level",
+                "\u2713 Head position is neutral"
+            ],
+            "issues": [
+                "Spine misalignment - appear hunched or leaning"
+            ],
+            "timestamp": "2026-04-06T14:24:16.197547",
+            "method": "Advanced body contour analysis"
+        },
+        {
+            "score": 100,
+            "overall": "Excellent posture! \u2705",
+            "feedback": [
+                "\u2713 Spine appears well aligned",
+                "\u2713 Good body centering",
+                "\u2713 Shoulders appear level",
+                "\u2713 Head position is neutral"
+            ],
+            "issues": [
+                "No major issues detected"
+            ],
+            "timestamp": "2026-04-06T14:56:45.807270",
+            "method": "Advanced body contour analysis"
+        },
+        {
+            "score": 55,
+            "overall": "Fair posture - multiple adjustments recommended",
+            "feedback": [
+                "\u2713 Shoulders appear level",
+                "\u2713 Head position is neutral"
+            ],
+            "issues": [
+                "Spine misalignment - appear hunched or leaning",
+                "Body leaning - stand more upright and centered"
+            ],
+            "timestamp": "2026-04-06T17:45:27.107483",
+            "method": "Advanced body contour analysis"
+        },
+        {
+            "score": 20,
+            "overall": "Poor posture - significant adjustments needed",
+            "feedback": [
+                "\u2713 Overall posture looks good"
+            ],
+            "issues": [
+                "Spine misalignment - appear hunched or leaning",
+                "Body leaning - stand more upright and centered",
+                "Uneven shoulders - align shoulders level",
+                "Head leaning forward - keep head over shoulders"
+            ],
+            "timestamp": "2026-04-07T10:41:18.322074",
+            "method": "Advanced body contour analysis"
+        }
+    ],
+    "sanket phad": [
+        {
+            "score": 0,
+            "overall": "No person detected",
+            "feedback": [
+                "Make sure you're clearly visible"
+            ],
+            "issues": [
+                "Camera positioning: Ensure full body is in frame"
+            ],
+            "timestamp": "2026-09-12T11:54:18.217775"
+        }
+    ]
+}

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitnessAI - Your Personal AI Fitness Coach</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/chat-widget.css">
+    <style>
+        .navbar-extra {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            flex-wrap: wrap;
+        }
+
+        .user-greeting {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+        }
+
+        .home-hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            width: 100%;
+            margin-top: 34px;
+        }
+
+        .home-stat {
+            padding: 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            backdrop-filter: blur(10px);
+        }
+
+        .home-stat strong {
+            display: block;
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+
+        .launch-band {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 90px;
+        }
+
+        .launch-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 24px;
+            margin-top: -40px;
+        }
+
+        .launch-card {
+            padding: 28px;
+            border-radius: 28px;
+            background: rgba(10, 18, 34, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(14px);
+        }
+
+        .launch-card h3 {
+            margin: 0 0 10px;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        .launch-card p {
+            margin: 0;
+            color: #c8d3e2;
+            line-height: 1.7;
+        }
+
+        .launch-points {
+            margin-top: 18px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .launch-point {
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #eff5fb;
+        }
+
+        .launch-highlight {
+            display: inline-block;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 107, 107, 0.18);
+            color: #ffd6cf;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 900px) {
+            .launch-grid {
+                grid-template-columns: 1fr;
+                margin-top: 30px;
+            }
+        }
+    </style>
+</head>
+<body class="home-body">
+    <nav class="nav">
+        <div class="logo">FitnessAI</div>
+        <div class="navbar-extra">
+            <div class="user-section" id="user-section" style="display:none;">
+                <span class="user-greeting">Welcome back, <strong id="username"></strong></span>
+                <a href="/dashboard" class="btn-nav">Dashboard</a>
+                <a href="/chatpage" class="btn-nav">Open Chat</a>
+                <a href="/logout" class="btn-nav">Logout</a>
+            </div>
+            <div id="guest-buttons" class="navbar-extra">
+                <a href="/auth" class="btn-nav">Login / Register</a>
+                <a href="/chatpage" class="btn-nav">Try Demo</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">AI Coaching Platform</span>
+            <h1>Train smarter with a premium gym-style fitness assistant</h1>
+            <p class="tagline">FitnessAI brings together coaching chat, workout generation, meal planning, posture analysis, motivation, achievements, and progress tracking in one polished experience.</p>
+            <div style="display:flex; gap:14px; justify-content:center; margin-top:30px; flex-wrap:wrap;">
+                <a href="/auth" class="cta-btn" id="main-cta-btn">Start Your Journey</a>
+                <a href="/chatpage" class="secondary-cta">Explore the Chatbot</a>
+            </div>
+
+            <div class="home-hero-stats">
+                <div class="home-stat">
+                    <strong>19+</strong>
+                    <span>fitness features in one place</span>
+                </div>
+                <div class="home-stat">
+                    <strong>24/7</strong>
+                    <span>AI guidance whenever you need it</span>
+                </div>
+                <div class="home-stat">
+                    <strong>1 Hub</strong>
+                    <span>chat, workouts, meals, posture, and progress</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="launch-band">
+        <div class="launch-grid">
+            <div class="launch-card">
+                <span class="launch-highlight">Why It Feels Better</span>
+                <h3>Built like a focused fitness product</h3>
+                <p>The visual direction now leans into a cinematic gym aesthetic with layered backgrounds, glass panels, and stronger hierarchy so the project feels more like a real app and less like a basic demo.</p>
+                <div class="launch-points">
+                    <div class="launch-point">Personalized chatbot with coach personality modes</div>
+                    <div class="launch-point">Mood-driven workout plans that match energy and mindset</div>
+                    <div class="launch-point">Achievements, dashboard analytics, and saved progress</div>
+                </div>
+            </div>
+            <div class="launch-card">
+                <span class="launch-highlight">Fast Start</span>
+                <h3>Open the features that matter most</h3>
+                <div class="launch-points">
+                    <a href="/chatpage" class="secondary-cta" style="text-align:center;">Chat with FitnessAI</a>
+                    <a href="/dashboard" class="secondary-cta" style="text-align:center;">View Dashboard</a>
+                    <a href="/workout" class="secondary-cta" style="text-align:center;">Generate Workout</a>
+                    <a href="/meal-plan" class="secondary-cta" style="text-align:center;">Create Meal Plan</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="features-section">
+        <h2>Designed To Feel Complete</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">Workout</div>
+                <h3>Smart Workout Design</h3>
+                <p>Create training plans based on duration, equipment, goal, experience, and current mood.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">Meals</div>
+                <h3>AI Meal Planning</h3>
+                <p>Generate complete plans or single meals with calorie targets and nutrition-aware choices.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">Coach</div>
+                <h3>Personality-Based Coaching</h3>
+                <p>Switch between friendly, strict, motivational, scientific, and chill coaching styles.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">Posture</div>
+                <h3>Form and Posture Support</h3>
+                <p>Use analysis tools to improve movement quality and reduce training mistakes.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">Stats</div>
+                <h3>Progress Dashboard</h3>
+                <p>Track key metrics, check charts, review motivation, and keep your fitness data in one view.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">Goals</div>
+                <h3>Motivation and Achievements</h3>
+                <p>Stay engaged with milestone badges, mood workouts, and goal-focused suggestions.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="cta-section-inner">
+            <h2>Ready to make the project feel premium end to end?</h2>
+            <p>Use the chatbot, explore the dashboard, and see the refreshed gym-style visual system across the app.</p>
+            <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+                <a href="/chatpage" class="cta-btn">Open Chatbot</a>
+                <a href="/auth" class="secondary-cta">Create Account</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 FitnessAI. Built for stronger coaching, cleaner visuals, and a better fitness experience.</p>
+        <p style="font-size:12px; margin-top:10px;">AI coaching, meal planning, workouts, posture support, and progress tracking in one place.</p>
+    </footer>
+
+    <script>
+        async function checkAuth() {
+            try {
+                const response = await fetch("/check-auth");
+                const data = await response.json();
+
+                if (data.authenticated) {
+                    document.getElementById("user-section").style.display = "flex";
+                    document.getElementById("guest-buttons").style.display = "none";
+                    document.getElementById("username").textContent = data.username;
+                    document.getElementById("main-cta-btn").href = "/dashboard";
+                    document.getElementById("main-cta-btn").textContent = "Go to Dashboard";
+                } else {
+                    document.getElementById("user-section").style.display = "none";
+                    document.getElementById("guest-buttons").style.display = "flex";
+                }
+            } catch (error) {
+                console.log("Auth check failed");
+            }
+        }
+
+        window.addEventListener("load", checkAuth);
+    </script>
+    <script src="/static/chat-widget.js"></script>
+</body>
+</html>

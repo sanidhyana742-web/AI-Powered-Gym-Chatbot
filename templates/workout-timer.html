@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Timer - FitnessAI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/chat-widget.css">
+    <style>
+        nav {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E72);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .btn-nav {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin-left: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .timer-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .timer-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        .timer-display {
+            font-size: 72px;
+            font-weight: bold;
+            color: #FF6B6B;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 30px;
+            border-radius: 10px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timer-mode {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .mode-btn {
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E72);
+            color: white;
+            border-color: #FF6B6B;
+        }
+
+        .mode-btn:hover {
+            border-color: #FF6B6B;
+        }
+
+        .timer-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 30px 0;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .btn-reset {
+            background: #ddd;
+            color: #333;
+        }
+
+        .exercises {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .exercises h2 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        .exercise-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: left;
+            border-left: 4px solid #FF6B6B;
+        }
+
+        .exercise-item h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+
+        .exercise-item p {
+            margin: 0;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .status {
+            font-size: 18px;
+            color: #666;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .status.active {
+            color: #4CAF50;
+        }
+
+        .status.rest {
+            color: #FF9800;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">💪 FitnessAI</div>
+        <div>
+            <a href="/dashboard" class="btn-nav">Dashboard</a>
+            <a href="/chatpage" class="btn-nav">Chat</a>
+            <a href="/calculator" class="btn-nav">Calculators</a>
+            <a href="/posture" class="btn-nav">Posture</a>
+        </div>
+    </nav>
+
+    <div class="timer-container">
+        <div class="timer-card">
+            <h1>⏱️ Workout Timer</h1>
+
+            <div class="timer-mode">
+                <button class="mode-btn active" onclick="setMode('simple')">⏱️ Simple Timer</button>
+                <button class="mode-btn" onclick="setMode('interval')">🔄 HIIT Timer</button>
+            </div>
+
+            <!-- SIMPLE TIMER -->
+            <div id="simple-mode">
+                <div class="timer-inputs">
+                    <div class="input-group">
+                        <label>Minutes</label>
+                        <input type="number" id="minutes" value="5" min="0" max="59">
+                    </div>
+                    <div class="input-group">
+                        <label>Seconds</label>
+                        <input type="number" id="seconds" value="0" min="0" max="59">
+                    </div>
+                    <div class="input-group">
+                        <label>Sets</label>
+                        <input type="number" id="sets" value="1" min="1" max="20">
+                    </div>
+                </div>
+            </div>
+
+            <!-- HIIT MODE -->
+            <div id="hiit-mode" style="display: none;">
+                <div class="timer-inputs">
+                    <div class="input-group">
+                        <label>Work (sec)</label>
+                        <input type="number" id="work-duration" value="30" min="5" max="300">
+                    </div>
+                    <div class="input-group">
+                        <label>Rest (sec)</label>
+                        <input type="number" id="rest-duration" value="10" min="5" max="300">
+                    </div>
+                    <div class="input-group">
+                        <label>Rounds</label>
+                        <input type="number" id="rounds" value="10" min="1" max="50">
+                    </div>
+                </div>
+            </div>
+
+            <div class="status" id="status">Ready to start</div>
+            <div class="timer-display" id="timer">05:00</div>
+
+            <div class="buttons">
+                <button class="btn-start" onclick="startTimer()">▶️ Start</button>
+                <button class="btn-stop" onclick="stopTimer()">⏹️ Stop</button>
+                <button class="btn-reset" onclick="resetTimer()">🔄 Reset</button>
+            </div>
+        </div>
+
+        <!-- EXERCISE SUGGESTIONS -->
+        <div class="exercises">
+            <h2>💪 Suggested Exercises for 5-minute Workout</h2>
+
+            <div class="exercise-item">
+                <h4>Push-ups</h4>
+                <p>1 minute - 3 sets of 10 reps | Builds chest and arm strength</p>
+            </div>
+
+            <div class="exercise-item">
+                <h4>Squats</h4>
+                <p>1 minute - 3 sets of 15 reps | Strengthens legs and glutes</p>
+            </div>
+
+            <div class="exercise-item">
+                <h4>Burpees</h4>
+                <p>1 minute - 3 sets of 8 reps | Full body cardio workout</p>
+            </div>
+
+            <div class="exercise-item">
+                <h4>Jumping Jacks</h4>
+                <p>1 minute - Continuous | Cardio and coordination</p>
+            </div>
+
+            <div class="exercise-item">
+                <h4>Plank Hold</h4>
+                <p>1 minute - 3 sets of 30 seconds | Core strength</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'simple';
+        let timerInterval = null;
+        let timeRemaining = 300;
+        let totalTime = 300;
+        let isRunning = false;
+        let currentSet = 1;
+        let totalSets = 1;
+
+        function setMode(mode) {
+            currentMode = mode;
+            const simpleBtns = document.querySelectorAll('#simple-mode');
+            const hiitBtns = document.querySelectorAll('#hiit-mode');
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (mode === 'simple') {
+                document.getElementById('simple-mode').style.display = 'block';
+                document.getElementById('hiit-mode').style.display = 'none';
+            } else {
+                document.getElementById('simple-mode').style.display = 'none';
+                document.getElementById('hiit-mode').style.display = 'block';
+            }
+            resetTimer();
+        }
+
+        function updateDisplay() {
+            const mins = Math.floor(timeRemaining / 60);
+            const secs = timeRemaining % 60;
+            document.getElementById('timer').textContent =
+                String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+
+            if (currentMode === 'simple') {
+                const minutes = parseInt(document.getElementById('minutes').value) || 0;
+                const seconds = parseInt(document.getElementById('seconds').value) || 0;
+                totalSets = parseInt(document.getElementById('sets').value) || 1;
+                timeRemaining = (minutes * 60) + seconds;
+            }
+
+            updateDisplay();
+            document.getElementById('status').textContent = `🏋️ Exercising - Set ${currentSet}/${totalSets}`;
+            document.getElementById('status').classList.add('active');
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+
+                if (timeRemaining <= 0) {
+                    playSound();
+                    if (currentSet < totalSets) {
+                        currentSet++;
+                        if (currentMode === 'simple') {
+                            const minutes = parseInt(document.getElementById('minutes').value) || 0;
+                            const seconds = parseInt(document.getElementById('seconds').value) || 0;
+                            timeRemaining = (minutes * 60) + seconds;
+                        }
+                        document.getElementById('status').textContent = `✅ Complete! Set ${currentSet}/${totalSets} starting...`;
+                    } else {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        document.getElementById('status').textContent = '🎉 Workout completed! Great job!';
+                        document.getElementById('status').classList.remove('active');
+                        document.getElementById('status').classList.add('active');
+                    }
+                }
+
+                updateDisplay();
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            document.getElementById('status').textContent = '⏸️ Timer paused';
+            document.getElementById('status').classList.remove('active', 'rest');
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            currentSet = 1;
+
+            if (currentMode === 'simple') {
+                const minutes = parseInt(document.getElementById('minutes').value) || 5;
+                const seconds = parseInt(document.getElementById('seconds').value) || 0;
+                timeRemaining = (minutes * 60) + seconds;
+            }
+
+            document.getElementById('status').textContent = 'Ready to start';
+            document.getElementById('status').classList.remove('active', 'rest');
+            updateDisplay();
+        }
+
+        function playSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Initialize
+        updateDisplay();
+    </script>
+    <script src="/static/chat-widget.js"></script>
+</body>
+
+</html>

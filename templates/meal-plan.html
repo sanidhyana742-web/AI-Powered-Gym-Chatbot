@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Plan Generator - FitnessAI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/chat-widget.css">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #FF8E72;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%),
+                url('https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=1200&q=80');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            color: #333;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .meal-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .meal-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .meal-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .meal-header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .controls-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .control-group select {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .control-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .meals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .meal-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid var(--primary);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .meal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .meal-card-header {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 142, 114, 0.1));
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .meal-card-header h3 {
+            margin: 0;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .meal-card-body {
+            padding: 1.5rem;
+        }
+
+        .meal-item {
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            background: #f9f9f9;
+            border-left: 3px solid var(--primary);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 107, 107, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+        }
+
+        .back-button:hover {
+            color: var(--secondary);
+        }
+
+        .meal-icons {
+            font-size: 2rem;
+        }
+
+        .calories {
+            display: inline-block;
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .meal-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .meals-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="home-body">
+    <nav class="nav">
+        <div class="logo">💪 FitnessAI</div>
+        <div>
+            <a href="/dashboard" class="btn-nav">Dashboard</a>
+            <a href="/logout" class="btn-nav">Logout</a>
+        </div>
+    </nav>
+
+    <div class="meal-container">
+        <button class="back-button" onclick="history.back()">← Back</button>
+
+        <div class="meal-header">
+            <h1>🍽️ Meal Plan Generator</h1>
+            <p>Get personalized meal plans based on your fitness goals</p>
+        </div>
+
+        <div class="controls-section">
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="fitnessGoal">📊 Fitness Goal</label>
+                    <select id="fitnessGoal">
+                        <option value="weight loss">Weight Loss</option>
+                        <option value="muscle gain">Muscle Gain</option>
+                        <option value="general fitness">General Fitness</option>
+                        <option value="endurance">Endurance</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="dietaryType">🌱 Dietary Type</label>
+                    <select id="dietaryType">
+                        <option value="mixed">Mixed</option>
+                        <option value="vegetarian">Vegetarian</option>
+                        <option value="vegan">Vegan</option>
+                        <option value="high-protein">High Protein</option>
+                        <option value="low-carb">Low Carb</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="servings">👥 Servings</label>
+                    <select id="servings">
+                        <option value="1">1 Person</option>
+                        <option value="2">2 People</option>
+                        <option value="4">4 People</option>
+                        <option value="6">6 People</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn" onclick="generateMealPlan()">🔄 Generate Full Plan</button>
+                <button class="btn btn-secondary" onclick="generateSingleMeal('breakfast')">🌅 Breakfast</button>
+                <button class="btn btn-secondary" onclick="generateSingleMeal('lunch')">🌤️ Lunch</button>
+                <button class="btn btn-secondary" onclick="generateSingleMeal('dinner')">🌙 Dinner</button>
+            </div>
+        </div>
+
+        <div id="mealsContainer">
+            <div class="loading">
+                <p>👉 Select options above and click "Generate Full Plan" or choose individual meals</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load user's fitness goal on page load
+        async function loadUserGoal() {
+            try {
+                const response = await fetch('/get-dashboard-data');
+                const data = await response.json();
+                const userGoal = data.profile.goal;
+                if (userGoal) {
+                    document.getElementById('fitnessGoal').value = userGoal;
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        async function generateMealPlan() {
+            const goal = document.getElementById('fitnessGoal').value;
+            const dietaryType = document.getElementById('dietaryType').value;
+            const servings = document.getElementById('servings').value;
+
+            const container = document.getElementById('mealsContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Generating your personalized meal plan...</p></div>';
+
+            try {
+                const response = await fetch('/generate-meal-plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fitness_goal: goal,
+                        dietary_type: dietaryType,
+                        servings: servings
+                    })
+                });
+
+                const data = await response.json();
+                displayMealPlan(data);
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ Error generating meal plan. Please try again.</div>`;
+                console.error('Error:', error);
+            }
+        }
+
+        async function generateSingleMeal(mealType) {
+            const goal = document.getElementById('fitnessGoal').value;
+            const dietaryType = document.getElementById('dietaryType').value;
+            const servings = document.getElementById('servings').value;
+
+            const container = document.getElementById('mealsContainer');
+            const emoji = mealType === 'breakfast' ? '🌅' : mealType === 'lunch' ? '🌤️' : '🌙';
+            container.innerHTML = `<div class="loading"><div class="spinner"></div><p>Generating ${emoji} ${mealType}...</p></div>`;
+
+            try {
+                const response = await fetch('/generate-single-meal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        meal_type: mealType,
+                        fitness_goal: goal,
+                        dietary_type: dietaryType,
+                        servings: servings
+                    })
+                });
+
+                const data = await response.json();
+                displaySingleMeal(data, mealType);
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ Error generating ${mealType}. Please try again.</div>`;
+                console.error('Error:', error);
+            }
+        }
+
+        function displayMealPlan(data) {
+            const container = document.getElementById('mealsContainer');
+            let html = '<div class="meals-grid">';
+
+            const meals = ['breakfast', 'lunch', 'dinner'];
+            const emojis = { breakfast: '🌅', lunch: '🌤️', dinner: '🌙' };
+
+            meals.forEach(meal => {
+                const mealData = data[meal] || {};
+                html += `
+                    <div class="meal-card">
+                        <div class="meal-card-header">
+                            <h3><span class="meal-icons">${emojis[meal]}</span> ${meal.charAt(0).toUpperCase() + meal.slice(1)}</h3>
+                        </div>
+                        <div class="meal-card-body">
+                            ${mealData.name ? `<div style="font-weight: 600; color: var(--primary); margin-bottom: 0.5rem; font-size: 1.1rem;">${mealData.name}</div>` : ''}
+                            ${mealData.items ? mealData.items.map(item => `<div class="meal-item">• ${item}</div>`).join('') : ''}
+                            ${mealData.calories ? `<div class="calories">⚡ ${mealData.calories} cal</div>` : ''}
+                            ${mealData.macros ? `<div style="margin-top: 1rem; padding: 0.8rem; background: #f0f0f0; border-radius: 4px; font-size: 0.9rem;"><strong>Macros:</strong> ${mealData.macros}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function displaySingleMeal(data, mealType) {
+            const container = document.getElementById('mealsContainer');
+            const emojis = { breakfast: '🌅', lunch: '🌤️', dinner: '🌙' };
+
+            let html = `
+                <div class="meals-grid">
+                    <div class="meal-card">
+                        <div class="meal-card-header">
+                            <h3><span class="meal-icons">${emojis[mealType]}</span> ${mealType.charAt(0).toUpperCase() + mealType.slice(1)}</h3>
+                        </div>
+                        <div class="meal-card-body">
+                            ${data.name ? `<div style="font-weight: 600; color: var(--primary); margin-bottom: 0.5rem; font-size: 1.1rem;">${data.name}</div>` : ''}
+                            ${data.items ? data.items.map(item => `<div class="meal-item">• ${item}</div>`).join('') : ''}
+                            ${data.calories ? `<div class="calories">⚡ ${data.calories} cal</div>` : ''}
+                            ${data.macros ? `<div style="margin-top: 1rem; padding: 0.8rem; background: #f0f0f0; border-radius: 4px; font-size: 0.9rem;"><strong>Macros:</strong> ${data.macros}</div>` : ''}
+                            ${data.instructions ? `<div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 107, 107, 0.05); border-radius: 4px; font-size: 0.9rem;"><strong>📝 Instructions:</strong><br>${data.instructions}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Load user's fitness goal on page load
+        window.addEventListener('load', loadUserGoal);
+    </script>
+    <script src="/static/chat-widget.js"></script>
+</body>
+
+</html>

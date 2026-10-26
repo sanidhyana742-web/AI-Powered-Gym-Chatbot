@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posture Checker - Fitness Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="/static/chat-widget.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%),
+                url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=80');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            color: #e2e8f0;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E72);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
+
+        .navbar h1 {
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.4);
+            border-bottom: 3px solid white;
+        }
+
+        .logout-btn {
+            background: rgba(255, 100, 100, 0.6);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 100, 100, 0.9);
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 142, 114, 0.1));
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E72);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: #cbd5e0;
+        }
+
+        .posture-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .camera-section {
+            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .section-title-icon {
+            font-size: 1.8rem;
+        }
+
+        .camera-wrapper {
+            position: relative;
+            background: #1a1a2e;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1.5rem;
+            border: 2px solid rgba(255, 107, 107, 0.2);
+            aspect-ratio: 4/3;
+        }
+
+        #cameraFeed {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .camera-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .camera-controls button {
+            padding: 14px 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
+        }
+
+        .btn-analyze {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E72);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #f44336, #da190b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn-stop:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(244, 67, 54, 0.5);
+        }
+
+        .tips-box {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 142, 114, 0.1));
+            border-left: 4px solid #FF6B6B;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .tips-box p {
+            font-size: 0.9rem;
+            color: #cbd5e0;
+            margin: 0.5rem 0;
+        }
+
+        .tips-box strong {
+            color: #FF8E72;
+        }
+
+        .results-section {
+            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 107, 107, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+            border-left: 5px solid #FF6B6B;
+            padding: 1.8rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .posture-score {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .score-excellent {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .score-good {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+
+        .score-fair {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
+        .score-poor {
+            background: linear-gradient(135deg, #f44336, #da190b);
+        }
+
+        .score-info {
+            flex: 1;
+        }
+
+        .overall-status {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+
+        .analysis-time {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .feedback-list,
+        .issues-list {
+            margin-bottom: 1.2rem;
+        }
+
+        .feedback-title,
+        .issues-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .issues-title {
+            color: #FF8E72;
+        }
+
+        .feedback-item,
+        .issue-item {
+            padding: 0.6rem 0 0.6rem 1.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e0;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-item::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .issue-item::before {
+            content: "!";
+            position: absolute;
+            left: 0;
+            color: #FF6B6B;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .history-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .history-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .clear-btn {
+            padding: 0.6rem 1.2rem;
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .clear-btn:hover {
+            background: #FF8E72;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        }
+
+        .history-item {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 142, 114, 0.05));
+            border-left: 4px solid #FF8E72;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 107, 107, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-content {
+            flex: 1;
+        }
+
+        .history-score {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E72);
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-right: 0.8rem;
+        }
+
+        .history-time {
+            color: #a0aec0;
+            font-size: 0.8rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #a0aec0;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 1.5rem;
+            color: #FF8E72;
+            font-weight: 500;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
+        }
+
+        .no-result {
+            text-align: center;
+            padding: 2rem;
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        @media (max-width: 1024px) {
+            .posture-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .posture-container {
+                padding: 1rem;
+                gap: 1.5rem;
+            }
+
+            .camera-section,
+            .results-section {
+                padding: 1.5rem;
+            }
+
+            .score-circle {
+                width: 90px;
+                height: 90px;
+                font-size: 1.8rem;
+            }
+
+            .camera-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .camera-controls button {
+                width: 100%;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .history-time {
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <h1>💪 Fitness Chatbot</h1>
+        <div class="nav-links">
+            <a href="/chatpage" class="nav-link">💬 Chat</a>
+            <a href="/dashboard" class="nav-link">📊 Dashboard</a>
+            <a href="/calculator" class="nav-link">🧮 Calculator</a>
+            <a href="/posture" class="nav-link active">📷 Posture</a>
+            <a href="/workout-timer" class="nav-link">⏱️ Timer</a>
+            <a href="/logout" class="nav-link logout-btn">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>📷 AI Posture Analyzer</h1>
+        <p>Real-time posture detection & correction guidance</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="posture-container">
+        <!-- Left: Camera Section -->
+        <div class="camera-section">
+            <h2 class="section-title">
+                <span class="section-title-icon">🎥</span>
+                Camera Feed
+            </h2>
+
+            <div class="camera-wrapper">
+                <video id="cameraFeed" autoplay playsinline style="transform: scaleX(-1);"></video>
+            </div>
+
+            <div class="camera-controls">
+                <button class="btn-start" onclick="startCamera()">
+                    <span>▶️ Start</span>
+                </button>
+                <button class="btn-analyze" onclick="captureAndAnalyze()">
+                    <span>✓ Analyze</span>
+                </button>
+                <button class="btn-stop" onclick="stopCamera()">
+                    <span>⏹ Stop</span>
+                </button>
+            </div>
+
+            <div class="tips-box">
+                <strong>💡 Quick Tips:</strong>
+                <p>✓ Stand facing camera, full body visible</p>
+                <p>✓ Good lighting from front</p>
+                <p>✓ Wear fitted clothes for best detection</p>
+                <p>✓ Stand 6-8 feet away from camera</p>
+            </div>
+        </div>
+
+        <!-- Right: Results Section -->
+        <div class="results-section">
+            <h2 class="section-title">
+                <span class="section-title-icon">📊</span>
+                Analysis Results
+            </h2>
+
+            <div id="analysisLoading" class="loading" style="display: none;">
+                ⏳ Analyzing your posture...
+            </div>
+
+            <div id="noResult" class="no-result">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎯</div>
+                <p>Start camera and click "Analyze" to check your posture</p>
+            </div>
+
+            <div id="resultDisplay"></div>
+
+            <!-- History Section -->
+            <div class="history-section">
+                <div class="history-header">
+                    <h3 class="history-title">
+                        <span>📈</span>
+                        Recent Analysis
+                    </h3>
+                    <button class="clear-btn" onclick="clearHistory()">🗑️ Clear</button>
+                </div>
+                <div id="historyList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let video = document.getElementById('cameraFeed');
+        let stream = null;
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' }
+                });
+                video.srcObject = stream;
+                document.querySelector('.btn-start').disabled = true;
+                document.querySelector('.btn-start').style.opacity = '0.5';
+            } catch (error) {
+                alert('❌ Camera access denied: ' + error.message);
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                document.querySelector('.btn-start').disabled = false;
+                document.querySelector('.btn-start').style.opacity = '1';
+            }
+        }
+
+        async function captureAndAnalyze() {
+            if (!stream) {
+                alert('Please start camera first');
+                return;
+            }
+
+            document.getElementById('analysisLoading').style.display = 'block';
+            document.getElementById('noResult').style.display = 'none';
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const context = canvas.getContext('2d');
+            context.scale(-1, 1);
+            context.drawImage(video, -canvas.width, 0);
+
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            try {
+                const response = await fetch('/analyze-posture', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: imageData })
+                });
+
+                const result = await response.json();
+                document.getElementById('analysisLoading').style.display = 'none';
+                displayResult(result);
+                loadHistory();
+            } catch (error) {
+                alert('Error analyzing posture: ' + error);
+                document.getElementById('analysisLoading').style.display = 'none';
+            }
+        }
+
+        function displayResult(result) {
+            const display = document.getElementById('resultDisplay');
+
+            if (result.error || result.score === 0) {
+                display.innerHTML = `
+                    <div class="result-card">
+                        <p style="color: #FF8E72; font-weight: 600;">⚠️ ${result.overall || result.error}</p>
+                        <p style="color: #a0aec0; margin-top: 0.5rem; font-size: 0.9rem;">${result.issues ? result.issues[0] : 'No pose detected'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let scoreClass = 'score-excellent';
+            if (result.score < 50) scoreClass = 'score-poor';
+            else if (result.score < 70) scoreClass = 'score-fair';
+            else if (result.score < 85) scoreClass = 'score-good';
+
+            let html = `
+                <div class="result-card">
+                    <div class="posture-score">
+                        <div class="score-circle ${scoreClass}">${result.score}</div>
+                        <div class="score-info">
+                            <div class="overall-status">${result.overall}</div>
+                            <div class="analysis-time">🕐 ${new Date(result.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                    </div>
+            `;
+
+            if (result.feedback && result.feedback.length > 0) {
+                html += `
+                    <div class="feedback-list">
+                        <div class="feedback-title">✅ What's Good:</div>
+                        ${result.feedback.map(fb => `<div class="feedback-item">${fb}</div>`).join('')}
+                    </div>
+                `;
+            }
+
+            if (result.issues && result.issues.length > 0 && result.issues[0] !== "No major issues detected") {
+                html += `
+                    <div class="issues-list">
+                        <div class="issues-title">🔧 Areas to Improve:</div>
+                        ${result.issues.map(issue => `<div class="issue-item">${issue}</div>`).join('')}
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            display.innerHTML = html;
+        }
+
+        async function loadHistory() {
+            try {
+                const response = await fetch('/get-posture-history');
+                const data = await response.json();
+
+                const historyList = document.getElementById('historyList');
+
+                if (!data.history || data.history.length === 0) {
+                    historyList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>No analysis history yet</p></div>';
+                    return;
+                }
+
+                historyList.innerHTML = data.history.reverse().map(item => `
+                    <div class="history-item">
+                        <div class="history-content">
+                            <span class="history-score">${item.score}</span>
+                            <span style="color: #e2e8f0;">${item.overall}</span>
+                            <div class="history-time">🕐 ${new Date(item.timestamp).toLocaleString()}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+
+        async function clearHistory() {
+            if (!confirm('Clear all posture analysis history?')) return;
+
+            try {
+                await fetch('/clear-posture-history', { method: 'POST' });
+                loadHistory();
+                document.getElementById('resultDisplay').innerHTML = '';
+                document.getElementById('noResult').style.display = 'block';
+            } catch (error) {
+                alert('Error clearing history: ' + error);
+            }
+        }
+
+        // Load history on page load
+        loadHistory();
+    </script>
+    <script src="/static/chat-widget.js"></script>
+</body>
+
+</html>

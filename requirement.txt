@@ -1,0 +1,10 @@
+numpy==1.24.3
+Flask==2.3.0
+google-generativeai>=0.7.0
+python-dotenv==1.0.0
+Werkzeug==2.3.0
+opencv-python==4.8.0
+
+# Optional: For Posture Detection Feature
+# Install separately with: pip install mediapipe
+# Note: mediapipe requires separate installation due to dependency conflicts

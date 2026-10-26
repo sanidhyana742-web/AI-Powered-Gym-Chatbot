@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Workout - FitnessAI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .mood-body {
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(8, 12, 24, 0.72), rgba(8, 12, 24, 0.86)),
+                url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1600&q=80") center/cover fixed;
+        }
+
+        .mood-shell {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 28px 20px 48px;
+        }
+
+        .hero-card,
+        .form-card,
+        .result-card {
+            background: rgba(10, 18, 34, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.26);
+            backdrop-filter: blur(14px);
+        }
+
+        .hero-card {
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .hero-card h1 {
+            margin: 0 0 10px;
+            color: #fff;
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+
+        .hero-card p {
+            margin: 0;
+            max-width: 720px;
+            color: #d4deeb;
+            font-size: 1.02rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .hero-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 18px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-link.primary {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e72);
+            border-color: transparent;
+        }
+
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .mood-card {
+            padding: 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.92);
+            color: #182235;
+            border: 2px solid transparent;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .mood-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 34px rgba(0, 0, 0, 0.2);
+        }
+
+        .mood-card.selected {
+            border-color: #ff6b6b;
+            background: linear-gradient(180deg, #fff6f4, #ffe2db);
+        }
+
+        .mood-name {
+            margin: 0 0 6px;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .mood-desc {
+            margin: 0;
+            color: #596273;
+            line-height: 1.55;
+            font-size: 0.92rem;
+        }
+
+        .form-card,
+        .result-card {
+            padding: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #f8fafc;
+            font-weight: 700;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 0.98rem;
+        }
+
+        .form-card button {
+            width: 100%;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e72);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .selected-mood {
+            margin-top: 14px;
+            color: #ffd166;
+            font-weight: 700;
+        }
+
+        .result-card {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .result-card.active {
+            display: block;
+        }
+
+        .result-headline {
+            margin: 0 0 10px;
+            color: #fff;
+            font-size: 1.7rem;
+        }
+
+        .result-copy {
+            color: #dbe5f0;
+            line-height: 1.7;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .result-section {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .result-section h3 {
+            margin: 0 0 12px;
+            color: #ffd166;
+        }
+
+        .exercise-list,
+        .benefit-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .exercise-item,
+        .benefit-item {
+            padding: 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .exercise-item strong,
+        .benefit-item strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .result-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .meta-chip {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 107, 107, 0.16);
+            color: #ffe3db;
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .error-box {
+            margin-top: 16px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 107, 107, 0.14);
+            color: #ffd8d8;
+            display: none;
+        }
+
+        @media (max-width: 820px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="mood-body">
+    <nav class="nav">
+        <div class="logo">FitnessAI</div>
+        <div>
+            <a href="/chatpage" class="btn-nav">Back to Chat</a>
+            <a href="/personality-mode" class="btn-nav">Personality</a>
+            <a href="/logout" class="btn-nav">Logout</a>
+        </div>
+    </nav>
+
+    <main class="mood-shell">
+        <section class="hero-card">
+            <h1>Mood-based workout planning</h1>
+            <p>Pick how you feel right now and let the chatbot generate a workout that fits your energy, mindset, and available equipment. The background uses a gym-style image so the page feels more premium and on-theme.</p>
+            <div class="hero-actions">
+                <a href="/chatpage" class="hero-link primary">Open Chatbot</a>
+                <a href="/achievements" class="hero-link">Achievements</a>
+                <a href="/personality-mode" class="hero-link">Personality Mode</a>
+            </div>
+        </section>
+
+        <section class="form-card">
+            <div class="mood-grid" id="moodGrid">
+                <article class="mood-card" data-mood="energetic">
+                    <p class="mood-name">Energetic</p>
+                    <p class="mood-desc">Push intensity with fast-paced training.</p>
+                </article>
+                <article class="mood-card" data-mood="demotivated">
+                    <p class="mood-name">Demotivated</p>
+                    <p class="mood-desc">Use approachable wins to restart momentum.</p>
+                </article>
+                <article class="mood-card" data-mood="stressed">
+                    <p class="mood-name">Stressed</p>
+                    <p class="mood-desc">Release tension with controlled movement.</p>
+                </article>
+                <article class="mood-card" data-mood="angry">
+                    <p class="mood-name">Angry</p>
+                    <p class="mood-desc">Channel intensity into productive effort.</p>
+                </article>
+                <article class="mood-card" data-mood="tired">
+                    <p class="mood-name">Tired</p>
+                    <p class="mood-desc">Keep it light, safe, and recovery-friendly.</p>
+                </article>
+                <article class="mood-card" data-mood="confident">
+                    <p class="mood-name">Confident</p>
+                    <p class="mood-desc">Take on a challenging session with structure.</p>
+                </article>
+                <article class="mood-card" data-mood="anxious">
+                    <p class="mood-name">Anxious</p>
+                    <p class="mood-desc">Calm the mind with steady, rhythmic work.</p>
+                </article>
+                <article class="mood-card" data-mood="bored">
+                    <p class="mood-name">Bored</p>
+                    <p class="mood-desc">Mix things up with variety and novelty.</p>
+                </article>
+            </div>
+
+            <div class="selected-mood" id="selectedMoodLabel">Selected mood: none</div>
+
+            <div class="form-grid">
+                <div class="field">
+                    <label for="duration">Duration in minutes</label>
+                    <input id="duration" type="number" min="10" max="120" value="30">
+                </div>
+                <div class="field">
+                    <label for="experience">Experience level</label>
+                    <select id="experience">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="equipment">Equipment</label>
+                    <select id="equipment">
+                        <option value="no equipment">No equipment</option>
+                        <option value="dumbbells">Dumbbells</option>
+                        <option value="full gym">Full gym</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="button" onclick="generateMoodWorkout()">Generate mood workout</button>
+            <div class="error-box" id="errorBox"></div>
+        </section>
+
+        <section class="result-card" id="resultCard">
+            <h2 class="result-headline" id="workoutName"></h2>
+            <div class="result-copy" id="workoutWhy"></div>
+            <div class="result-meta" id="resultMeta"></div>
+
+            <div class="result-grid">
+                <div class="result-section">
+                    <h3>Exercises</h3>
+                    <div class="exercise-list" id="exerciseList"></div>
+                </div>
+                <div class="result-section">
+                    <h3>Mental benefits</h3>
+                    <div class="benefit-list" id="benefitList"></div>
+                    <h3 style="margin-top:18px;">Motivation note</h3>
+                    <div class="result-copy" id="motivationText"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let selectedMood = "";
+
+        function titleCase(value) {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+        }
+
+        function showError(message) {
+            const box = document.getElementById("errorBox");
+            box.style.display = "block";
+            box.textContent = message;
+        }
+
+        function clearError() {
+            const box = document.getElementById("errorBox");
+            box.style.display = "none";
+            box.textContent = "";
+        }
+
+        document.getElementById("moodGrid").addEventListener("click", (event) => {
+            const card = event.target.closest(".mood-card");
+            if (!card) {
+                return;
+            }
+
+            selectedMood = card.dataset.mood;
+            document.querySelectorAll(".mood-card").forEach((node) => {
+                node.classList.toggle("selected", node === card);
+            });
+            document.getElementById("selectedMoodLabel").textContent = "Selected mood: " + titleCase(selectedMood);
+            clearError();
+        });
+
+        function renderWorkout(data) {
+            document.getElementById("resultCard").classList.add("active");
+            document.getElementById("workoutName").textContent = data.workout_name || "Custom workout";
+            document.getElementById("workoutWhy").textContent = data.why_this_workout || "";
+
+            const meta = document.getElementById("resultMeta");
+            meta.innerHTML = "";
+            [
+                data.mood ? "Mood: " + titleCase(data.mood) : "",
+                data.duration ? "Duration: " + data.duration : "",
+                selectedMood ? "Experience: " + titleCase(document.getElementById("experience").value) : ""
+            ].filter(Boolean).forEach((text) => {
+                const chip = document.createElement("div");
+                chip.className = "meta-chip";
+                chip.textContent = text;
+                meta.appendChild(chip);
+            });
+
+            const exerciseList = document.getElementById("exerciseList");
+            exerciseList.innerHTML = "";
+            (data.exercises || []).forEach((exercise, index) => {
+                const item = document.createElement("div");
+                item.className = "exercise-item";
+                item.innerHTML =
+                    "<strong>" + (index + 1) + ". " + (exercise.name || "Exercise") + "</strong>" +
+                    "<div>Sets/Reps: " + (exercise.sets_reps || "As suggested") + "</div>" +
+                    "<div>Instructions: " + (exercise.instructions || "Follow proper form.") + "</div>";
+                exerciseList.appendChild(item);
+            });
+
+            const benefitList = document.getElementById("benefitList");
+            benefitList.innerHTML = "";
+            (data.mental_benefits || []).forEach((benefit) => {
+                const item = document.createElement("div");
+                item.className = "benefit-item";
+                item.innerHTML = "<strong>Benefit</strong><div>" + benefit + "</div>";
+                benefitList.appendChild(item);
+            });
+
+            document.getElementById("motivationText").textContent = data.motivation_tips || "";
+            document.getElementById("resultCard").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        async function generateMoodWorkout() {
+            clearError();
+
+            if (!selectedMood) {
+                showError("Please select a mood before generating a workout.");
+                return;
+            }
+
+            const duration = parseInt(document.getElementById("duration").value, 10);
+            const experience = document.getElementById("experience").value;
+            const equipment = document.getElementById("equipment").value;
+
+            try {
+                const response = await fetch("/get-mood-workout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        mood: selectedMood,
+                        duration: duration,
+                        experience: experience,
+                        equipment: equipment
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || "Workout generation failed.");
+                }
+
+                renderWorkout(data);
+            } catch (error) {
+                showError(error.message || "Failed to generate workout.");
+            }
+        }
+    </script>
+</body>
+</html>

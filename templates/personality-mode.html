@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Mode - FitnessAI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .personality-body {
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(7, 12, 24, 0.72), rgba(7, 12, 24, 0.84)),
+                url("https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1600&q=80") center/cover fixed;
+        }
+
+        .page-shell {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 28px 20px 48px;
+        }
+
+        .hero-panel,
+        .chat-panel,
+        .status-panel {
+            background: rgba(10, 18, 34, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(14px);
+        }
+
+        .hero-panel {
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 107, 107, 0.14);
+            color: #ffd3c8;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .hero-panel h1 {
+            margin: 0 0 12px;
+            color: #fff;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+        }
+
+        .hero-panel p {
+            margin: 0;
+            max-width: 720px;
+            color: #d8e2f0;
+            font-size: 1.02rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 180px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .hero-btn.primary {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e72);
+            border-color: transparent;
+        }
+
+        .status-panel {
+            padding: 18px 22px;
+            margin: 0 0 24px;
+        }
+
+        .status-title {
+            margin: 0 0 8px;
+            color: #ffd166;
+            font-size: 0.92rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .status-value {
+            color: #fff;
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .status-copy {
+            margin-top: 6px;
+            color: #c5d0de;
+        }
+
+        .personality-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .personality-card {
+            position: relative;
+            padding: 22px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #182235;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        .personality-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 32px rgba(0, 0, 0, 0.22);
+        }
+
+        .personality-card.selected {
+            border-color: #ff6b6b;
+            background: linear-gradient(180deg, #fff6f4, #ffe2db);
+        }
+
+        .card-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e72);
+            color: #fff;
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .personality-card h2 {
+            margin: 0 0 8px;
+            font-size: 1.25rem;
+        }
+
+        .personality-card p {
+            margin: 0 0 14px;
+            color: #4c5566;
+            line-height: 1.6;
+        }
+
+        .card-tag {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: #1f2937;
+            color: #f8fafc;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .chat-panel {
+            padding: 24px;
+        }
+
+        .chat-panel h3 {
+            margin: 0 0 14px;
+            color: #fff;
+            font-size: 1.3rem;
+        }
+
+        .chat-log {
+            min-height: 220px;
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.06);
+            margin-bottom: 16px;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            line-height: 1.6;
+        }
+
+        .message.user {
+            margin-left: auto;
+            max-width: 78%;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e72);
+            color: #fff;
+        }
+
+        .message.bot {
+            max-width: 82%;
+            background: rgba(255, 255, 255, 0.1);
+            color: #eaf1f8;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .chat-input-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+        }
+
+        .chat-input-row input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .chat-input-row button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e72);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .hint-copy {
+            margin-top: 12px;
+            color: #b9c6d4;
+            font-size: 0.92rem;
+        }
+
+        @media (max-width: 760px) {
+            .chat-input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+            }
+
+            .hero-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="personality-body">
+    <nav class="nav">
+        <div class="logo">FitnessAI</div>
+        <div>
+            <a href="/chatpage" class="btn-nav">Back to Chat</a>
+            <a href="/dashboard" class="btn-nav">Dashboard</a>
+            <a href="/logout" class="btn-nav">Logout</a>
+        </div>
+    </nav>
+
+    <main class="page-shell">
+        <section class="hero-panel">
+            <span class="eyebrow">Coaching Style</span>
+            <h1>Choose how your AI coach talks to you</h1>
+            <p>Switch between supportive, strict, motivational, scientific, and chill coaching styles. Your selection is saved to your account and used in personalized fitness replies.</p>
+            <div class="hero-actions">
+                <a href="/chatpage" class="hero-btn primary">Use in Chatbot</a>
+                <a href="/mood-workout" class="hero-btn">Open Mood Workout</a>
+                <a href="/achievements" class="hero-btn">View Achievements</a>
+            </div>
+        </section>
+
+        <section class="status-panel" id="statusPanel" style="display:none;">
+            <div class="status-title">Current Personality</div>
+            <div class="status-value" id="currentPersonalityName"></div>
+            <div class="status-copy" id="currentPersonalityDesc"></div>
+        </section>
+
+        <section class="personality-grid" id="personalityGrid">
+            <article class="personality-card" data-personality="friendly">
+                <div class="card-badge">FR</div>
+                <h2>Friendly</h2>
+                <p>A supportive coach who keeps the tone warm, practical, and confidence-building.</p>
+                <span class="card-tag">Best for consistency</span>
+            </article>
+            <article class="personality-card" data-personality="strict">
+                <div class="card-badge">ST</div>
+                <h2>Strict</h2>
+                <p>A direct trainer who cuts excuses and pushes you toward disciplined action.</p>
+                <span class="card-tag">Best for accountability</span>
+            </article>
+            <article class="personality-card" data-personality="motivational">
+                <div class="card-badge">MV</div>
+                <h2>Motivational</h2>
+                <p>An energetic coach that brings intensity, hype, and momentum to every answer.</p>
+                <span class="card-tag">Best for energy</span>
+            </article>
+            <article class="personality-card" data-personality="scientific">
+                <div class="card-badge">SC</div>
+                <h2>Scientific</h2>
+                <p>An evidence-first style that explains training, nutrition, and recovery with logic.</p>
+                <span class="card-tag">Best for detail</span>
+            </article>
+            <article class="personality-card" data-personality="chill">
+                <div class="card-badge">CH</div>
+                <h2>Chill</h2>
+                <p>A relaxed fitness buddy that keeps things simple, calm, and easy to follow.</p>
+                <span class="card-tag">Best for low pressure</span>
+            </article>
+        </section>
+
+        <section class="chat-panel">
+            <h3>Try your selected coach style</h3>
+            <div class="chat-log" id="chatLog"></div>
+            <div class="chat-input-row">
+                <input id="chatInput" type="text" placeholder="Ask about workouts, meals, recovery, or motivation">
+                <button type="button" onclick="sendPersonalityMessage()">Send</button>
+            </div>
+            <div class="hint-copy">Tip: press Enter to send and test how the chatbot responds in the selected personality mode.</div>
+        </section>
+    </main>
+
+    <script>
+        const descriptions = {
+            friendly: "A supportive friend who motivates you with encouragement.",
+            strict: "A tough coach who pushes you to your limits.",
+            motivational: "An inspirational coach who keeps your momentum high.",
+            scientific: "A fitness scientist who explains everything with data.",
+            chill: "A relaxed buddy who keeps fitness simple and enjoyable."
+        };
+
+        let selectedPersonality = "friendly";
+
+        function prettify(value) {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+        }
+
+        function renderSelectedCard() {
+            document.querySelectorAll(".personality-card").forEach((card) => {
+                card.classList.toggle("selected", card.dataset.personality === selectedPersonality);
+            });
+        }
+
+        function renderStatus() {
+            document.getElementById("statusPanel").style.display = "block";
+            document.getElementById("currentPersonalityName").textContent = prettify(selectedPersonality);
+            document.getElementById("currentPersonalityDesc").textContent = descriptions[selectedPersonality] || "";
+        }
+
+        function addMessage(role, text) {
+            const log = document.getElementById("chatLog");
+            const message = document.createElement("div");
+            message.className = "message " + role;
+            message.textContent = text;
+            log.appendChild(message);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        async function loadCurrentPersonality() {
+            try {
+                const response = await fetch("/get-ai-personality");
+                const data = await response.json();
+                selectedPersonality = data.personality || "friendly";
+            } catch (error) {
+                selectedPersonality = "friendly";
+            }
+
+            renderSelectedCard();
+            renderStatus();
+            addMessage("bot", "Your coach is ready. Choose a personality card above or ask a fitness question here.");
+        }
+
+        async function setPersonality(personality) {
+            const response = await fetch("/set-ai-personality", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ personality })
+            });
+
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || "Unable to save personality");
+            }
+        }
+
+        async function handlePersonalitySelect(personality) {
+            selectedPersonality = personality;
+            renderSelectedCard();
+            renderStatus();
+
+            try {
+                await setPersonality(personality);
+                addMessage("bot", "Coach mode updated to " + prettify(personality) + ".");
+            } catch (error) {
+                addMessage("bot", "I could not save that coach style. Please try again.");
+            }
+        }
+
+        async function sendPersonalityMessage() {
+            const input = document.getElementById("chatInput");
+            const message = input.value.trim();
+            if (!message) {
+                return;
+            }
+
+            addMessage("user", message);
+            input.value = "";
+
+            try {
+                const response = await fetch("/get-personalized-response", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message })
+                });
+                const data = await response.json();
+                addMessage("bot", data.response || "No response was returned.");
+            } catch (error) {
+                addMessage("bot", "The personality chat request failed. Please try again.");
+            }
+        }
+
+        document.getElementById("personalityGrid").addEventListener("click", (event) => {
+            const card = event.target.closest(".personality-card");
+            if (!card) {
+                return;
+            }
+            handlePersonalitySelect(card.dataset.personality);
+        });
+
+        document.getElementById("chatInput").addEventListener("keypress", (event) => {
+            if (event.key === "Enter") {
+                sendPersonalityMessage();
+            }
+        });
+
+        loadCurrentPersonality();
+    </script>
+</body>
+</html>

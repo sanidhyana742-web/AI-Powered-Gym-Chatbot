@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Calculators - FitnessAI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/chat-widget.css">
+    <style>
+        .calc-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .calc-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .calc-card h2 {
+            margin-top: 0;
+            color: #FF6B6B;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E72);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            background: #f0f9ff;
+            border-left: 4px solid #FF6B6B;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result h3 {
+            margin: 0 0 10px 0;
+            color: #FF6B6B;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .result-category {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .result-category .label {
+            font-weight: bold;
+            color: #666;
+        }
+
+        .result-category .value {
+            color: #FF6B6B;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .macros-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .macros-table th,
+        .macros-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .macros-table th {
+            background: #f5f5f5;
+            font-weight: bold;
+        }
+
+        nav {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E72);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .btn-nav {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%),
+                url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">💪 FitnessAI</div>
+        <div>
+            <a href="/dashboard" class="btn-nav">Dashboard</a>
+            <a href="/chatpage" class="btn-nav">Chat</a>
+            <a href="/posture" class="btn-nav">Posture</a>
+            <a href="/" class="btn-nav">Home</a>
+        </div>
+    </nav>
+
+    <div class="calc-container">
+        <h1 style="text-align: center; color: #333; margin-top: 0;">📊 Fitness Calculators</h1>
+
+        <div class="calc-grid">
+            <!-- BMI CALCULATOR -->
+            <div class="calc-card">
+                <h2>📏 BMI Calculator</h2>
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="bmi-weight" placeholder="Enter weight in kg">
+                </div>
+                <div class="form-group">
+                    <label>Height (cm)</label>
+                    <input type="number" id="bmi-height" placeholder="Enter height in cm">
+                </div>
+                <button class="btn-calculate" onclick="calculateBMI()">Calculate BMI</button>
+                <div id="bmi-result" class="result">
+                    <h3>Your BMI Results</h3>
+                    <div class="result-value" id="bmi-value"></div>
+                    <div class="result-category">
+                        <div class="label">Category:</div>
+                        <div class="value" id="bmi-category"></div>
+                    </div>
+                    <div class="result-category">
+                        <div class="label">Recommendation:</div>
+                        <div class="value" id="bmi-advice"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CALORIE CALCULATOR -->
+            <div class="calc-card">
+                <h2>🔥 Calorie Calculator</h2>
+                <div class="form-group">
+                    <label>Age (years)</label>
+                    <input type="number" id="cal-age" placeholder="Enter age" value="30">
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="cal-weight" placeholder="Enter weight">
+                </div>
+                <div class="form-group">
+                    <label>Height (cm)</label>
+                    <input type="number" id="cal-height" placeholder="Enter height">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="cal-gender">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Activity Level</label>
+                    <select id="cal-activity">
+                        <option value="1.2">Sedentary (little exercise)</option>
+                        <option value="1.375">Lightly active (1-3 days/week)</option>
+                        <option value="1.55" selected>Moderate active (3-5 days/week)</option>
+                        <option value="1.725">Very active (6-7 days/week)</option>
+                        <option value="1.9">Extremely active (athlete)</option>
+                    </select>
+                </div>
+                <button class="btn-calculate" onclick="calculateCalories()">Calculate</button>
+                <div id="cal-result" class="result">
+                    <h3>Your Daily Calorie Needs</h3>
+                    <div class="result-category">
+                        <div class="label">BMR (Basal Metabolic Rate):</div>
+                        <div class="value" id="cal-bmr"></div>
+                    </div>
+                    <div class="result-category">
+                        <div class="label">TDEE (Daily Calorie Needs):</div>
+                        <div class="value" id="cal-tdee"></div>
+                    </div>
+                    <table class="macros-table">
+                        <thead>
+                            <tr>
+                                <th>Macro</th>
+                                <th>Daily Intake</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Protein</td>
+                                <td><span id="cal-protein"></span> g</td>
+                            </tr>
+                            <tr>
+                                <td>Carbs</td>
+                                <td><span id="cal-carbs"></span> g</td>
+                            </tr>
+                            <tr>
+                                <td>Fat</td>
+                                <td><span id="cal-fat"></span> g</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- NUTRITION GUIDE -->
+        <div class="calc-card">
+            <h2>🥗 Macro Ratios Guide</h2>
+            <table class="macros-table">
+                <thead>
+                    <tr>
+                        <th>Goal</th>
+                        <th>Protein</th>
+                        <th>Carbs</th>
+                        <th>Fat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Weight Loss</strong></td>
+                        <td>30-40%</td>
+                        <td>30-40%</td>
+                        <td>25-35%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Muscle Gain</strong></td>
+                        <td>30-35%</td>
+                        <td>45-50%</td>
+                        <td>15-20%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maintenance</strong></td>
+                        <td>25-30%</td>
+                        <td>45-55%</td>
+                        <td>20-25%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Endurance</strong></td>
+                        <td>20-25%</td>
+                        <td>60-65%</td>
+                        <td>15-20%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function calculateBMI() {
+            const weight = parseFloat(document.getElementById('bmi-weight').value);
+            const height = parseFloat(document.getElementById('bmi-height').value);
+
+            if (!weight || !height) {
+                alert('Please enter both weight and height');
+                return;
+            }
+
+            try {
+                const response = await fetch('/calculate-bmi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ weight, height })
+                });
+
+                const data = await response.json();
+                document.getElementById('bmi-value').textContent = data.bmi + ' kg/m²';
+                document.getElementById('bmi-category').textContent = data.category;
+                document.getElementById('bmi-advice').textContent = data.advice;
+                document.getElementById('bmi-result').classList.add('show');
+            } catch (error) {
+                alert('Error calculating BMI');
+            }
+        }
+
+        async function calculateCalories() {
+            const age = parseInt(document.getElementById('cal-age').value);
+            const weight = parseFloat(document.getElementById('cal-weight').value);
+            const height = parseFloat(document.getElementById('cal-height').value);
+            const gender = document.getElementById('cal-gender').value;
+            const activity_level = parseFloat(document.getElementById('cal-activity').value);
+
+            if (!age || !weight || !height) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            try {
+                const response = await fetch('/calculate-calories', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ age, weight, height, gender, activity_level })
+                });
+
+                const data = await response.json();
+                document.getElementById('cal-bmr').textContent = data.bmr + ' calories/day';
+                document.getElementById('cal-tdee').textContent = data.tdee + ' calories/day';
+                document.getElementById('cal-protein').textContent = data.macros.protein_g;
+                document.getElementById('cal-carbs').textContent = data.macros.carbs_g;
+                document.getElementById('cal-fat').textContent = data.macros.fat_g;
+                document.getElementById('cal-result').classList.add('show');
+            } catch (error) {
+                alert('Error calculating calories');
+            }
+        }
+    </script>
+    <script src="/static/chat-widget.js"></script>
+</body>
+
+</html>

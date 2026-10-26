@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Generator - FitnessAI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/chat-widget.css">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #FF8E72;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f5f5;
+            color: #333;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .workout-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            min-height: 90vh;
+        }
+
+        .workout-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .workout-header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .workout-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .workout-header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .controls-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .control-group select,
+        .control-group input {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .control-group select:focus,
+        .control-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .workout-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid var(--primary);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .workout-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .workout-card-header {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 142, 114, 0.1));
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .workout-card-header h3 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .workout-card-body {
+            padding: 1.5rem;
+        }
+
+        .exercise-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f9f9f9;
+            border-left: 3px solid var(--primary);
+            border-radius: 4px;
+        }
+
+        .exercise-item .name {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .exercise-item .details {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 107, 107, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+        }
+
+        .back-button:hover {
+            color: var(--secondary);
+        }
+
+        @media (max-width: 1024px) {
+            .workout-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="home-body">
+    <nav class="nav">
+        <div class="logo">💪 FitnessAI</div>
+        <div>
+            <a href="/dashboard" class="btn-nav">Dashboard</a>
+            <a href="/logout" class="btn-nav">Logout</a>
+        </div>
+    </nav>
+
+    <div class="workout-container">
+        <div class="workout-main">
+            <button class="back-button" onclick="history.back()">← Back</button>
+
+            <div class="workout-header">
+                <h1>🏋️ Workout Generator</h1>
+                <p>Get personalized workouts based on your fitness goals</p>
+            </div>
+
+            <div class="controls-section">
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="fitnessGoal">📊 Fitness Goal</label>
+                        <select id="fitnessGoal">
+                            <option value="weight loss">Weight Loss</option>
+                            <option value="muscle gain">Muscle Gain</option>
+                            <option value="general fitness">General Fitness</option>
+                            <option value="endurance">Endurance</option>
+                            <option value="flexibility">Flexibility</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="duration">⏱️ Workout Duration</label>
+                        <select id="duration">
+                            <option value="30">30 Minutes</option>
+                            <option value="45">45 Minutes</option>
+                            <option value="60">60 Minutes</option>
+                            <option value="90">90 Minutes</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="equipment">🏋️ Equipment Available</label>
+                        <select id="equipment">
+                            <option value="no equipment">No Equipment</option>
+                            <option value="dumbbells">Dumbbells</option>
+                            <option value="barbell">Barbell</option>
+                            <option value="full gym">Full Gym</option>
+                            <option value="home gym">Home Gym</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="intensity">⚡ Intensity Level</label>
+                        <select id="intensity">
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="expert">Expert</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn" onclick="generateWorkout()">🔄 Generate Workout</button>
+                    <button class="btn btn-secondary" onclick="generateQuickWorkout()">⚡ Quick Workout (15 min)</button>
+                </div>
+            </div>
+
+            <div id="workoutContainer">
+                <div class="loading">
+                    <p>👉 Select options above and click "Generate Workout" to get started</p>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        // Load user's fitness goal on page load
+        async function loadUserGoal() {
+            try {
+                const response = await fetch('/get-dashboard-data');
+                const data = await response.json();
+                const userGoal = data.profile.goal;
+                if (userGoal) {
+                    document.getElementById('fitnessGoal').value = userGoal;
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        async function generateWorkout() {
+            const goal = document.getElementById('fitnessGoal').value;
+            const duration = document.getElementById('duration').value;
+            const equipment = document.getElementById('equipment').value;
+            const intensity = document.getElementById('intensity').value;
+
+            const container = document.getElementById('workoutContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Generating your personalized workout...</p></div>';
+
+            try {
+                const response = await fetch('/generate-workout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fitness_goal: goal,
+                        duration: duration,
+                        equipment: equipment,
+                        intensity: intensity
+                    })
+                });
+
+                const data = await response.json();
+                displayWorkout(data);
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ Error generating workout. Please try again.</div>`;
+                console.error('Error:', error);
+            }
+        }
+
+        async function generateQuickWorkout() {
+            const goal = document.getElementById('fitnessGoal').value;
+
+            const container = document.getElementById('workoutContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Generating quick 15-minute workout...</p></div>';
+
+            try {
+                const response = await fetch('/generate-workout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fitness_goal: goal,
+                        duration: '15',
+                        equipment: 'no equipment',
+                        intensity: 'intermediate'
+                    })
+                });
+
+                const data = await response.json();
+                displayWorkout(data);
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ Error generating workout. Please try again.</div>`;
+                console.error('Error:', error);
+            }
+        }
+
+        function displayWorkout(data) {
+            const container = document.getElementById('workoutContainer');
+
+            let html = '<div class="workout-card">';
+            html += '<div class="workout-card-header"><h3>🏋️ ' + data.workout_name + '</h3></div>';
+            html += '<div class="workout-card-body">';
+            html += '<div style="margin-bottom: 1rem; padding: 1rem; background: rgba(255, 107, 107, 0.05); border-radius: 6px;">';
+            html += '<strong>Duration:</strong> ' + data.duration + '<br>';
+            html += '<strong>Intensity:</strong> ' + data.intensity + '<br>';
+            html += '<strong>Focus:</strong> ' + data.focus + '<br>';
+            html += '<strong>Warm-up:</strong> ' + data.warmup + '';
+            html += '</div>';
+
+            if (data.exercises && data.exercises.length > 0) {
+                html += '<div style="margin-bottom: 1rem;"><strong style="color: var(--primary); font-size: 1.1rem;">📋 Exercises:</strong></div>';
+                data.exercises.forEach((exercise, index) => {
+                    html += '<div class="exercise-item">';
+                    html += '<div class="name">' + (index + 1) + '. ' + exercise.name + '</div>';
+                    html += '<div class="details">';
+                    html += '• <strong>Sets x Reps:</strong> ' + exercise.sets_reps + '<br>';
+                    html += '• <strong>Rest:</strong> ' + exercise.rest + '<br>';
+                    html += '• <strong>Instructions:</strong> ' + exercise.instructions + '';
+                    html += '</div>';
+                    html += '</div>';
+                });
+            }
+
+            if (data.cooldown) {
+                html += '<div style="margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 6px;">';
+                html += '<strong>Cool-down:</strong> ' + data.cooldown + '';
+                html += '</div>';
+            }
+
+            html += '</div></div>';
+            container.innerHTML = html;
+
+        }
+
+        window.addEventListener('load', loadUserGoal);
+    </script>
+    <script src="/static/chat-widget.js"></script>
+</body>
+
+</html>

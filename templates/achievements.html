@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements - FitnessAI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .achievements-body {
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(8, 10, 20, 0.72), rgba(8, 10, 20, 0.88)),
+                url("https://images.unsplash.com/photo-1517836357463-d25ddfcbf042?auto=format&fit=crop&w=1600&q=80") center/cover fixed;
+        }
+
+        .achievements-shell {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 28px 20px 48px;
+        }
+
+        .hero-card,
+        .stats-card,
+        .list-card {
+            background: rgba(10, 18, 34, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.26);
+            backdrop-filter: blur(14px);
+        }
+
+        .hero-card,
+        .stats-card,
+        .list-card {
+            padding: 24px;
+        }
+
+        .hero-card {
+            margin-bottom: 24px;
+        }
+
+        .hero-card h1 {
+            margin: 0 0 10px;
+            color: #fff;
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+
+        .hero-card p {
+            margin: 0;
+            max-width: 760px;
+            color: #d6dfeb;
+            font-size: 1.02rem;
+        }
+
+        .hero-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .hero-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-link.primary {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e72);
+            border-color: transparent;
+        }
+
+        .stats-card {
+            margin-bottom: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .stat-tile {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-label {
+            color: #9fb2c7;
+            font-size: 0.86rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 700;
+        }
+
+        .stat-value {
+            margin-top: 8px;
+            color: #fff;
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .progress-wrap {
+            margin-top: 18px;
+        }
+
+        .progress-copy {
+            color: #d4deeb;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 18px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.09);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e72);
+            transition: width 0.35s ease;
+        }
+
+        .section-title {
+            margin: 0 0 16px;
+            color: #fff;
+            font-size: 1.4rem;
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .achievement-card {
+            padding: 18px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .achievement-card.unlocked {
+            background: linear-gradient(180deg, rgba(255, 214, 102, 0.18), rgba(255, 107, 107, 0.12));
+            border-color: rgba(255, 214, 102, 0.42);
+        }
+
+        .achievement-card.locked {
+            opacity: 0.88;
+        }
+
+        .achievement-points {
+            display: inline-block;
+            margin-bottom: 10px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffd166;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .achievement-card h3 {
+            margin: 0 0 8px;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .achievement-card p {
+            margin: 0;
+            color: #d7e0eb;
+            line-height: 1.6;
+        }
+
+        .achievement-date {
+            margin-top: 12px;
+            color: #ffd9a0;
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .empty-state {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #d7e0eb;
+        }
+    </style>
+</head>
+<body class="achievements-body">
+    <nav class="nav">
+        <div class="logo">FitnessAI</div>
+        <div>
+            <a href="/chatpage" class="btn-nav">Back to Chat</a>
+            <a href="/mood-workout" class="btn-nav">Mood Workout</a>
+            <a href="/logout" class="btn-nav">Logout</a>
+        </div>
+    </nav>
+
+    <main class="achievements-shell">
+        <section class="hero-card">
+            <h1>Achievement tracker</h1>
+            <p>Your badges, points, and progress now load directly from the chatbot achievement APIs. This page also uses a gym-style hero image so the whole project feels more polished and visual.</p>
+            <div class="hero-links">
+                <a href="/chatpage" class="hero-link primary">Use Chatbot</a>
+                <a href="/personality-mode" class="hero-link">Personality Mode</a>
+                <a href="/mood-workout" class="hero-link">Mood Workout</a>
+            </div>
+        </section>
+
+        <section class="stats-card">
+            <h2 class="section-title">Progress overview</h2>
+            <div class="progress-wrap">
+                <div class="progress-copy" id="progressCopy">Loading progress...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-tile">
+                    <div class="stat-label">Unlocked</div>
+                    <div class="stat-value" id="unlockedValue">0</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">Total Badges</div>
+                    <div class="stat-value" id="totalValue">0</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">Points</div>
+                    <div class="stat-value" id="pointsValue">0</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">Rank</div>
+                    <div class="stat-value" id="rankValue">-</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="list-card" style="margin-bottom:24px;">
+            <h2 class="section-title">Unlocked badges</h2>
+            <div class="achievement-grid" id="unlockedGrid"></div>
+        </section>
+
+        <section class="list-card">
+            <h2 class="section-title">Locked badges</h2>
+            <div class="achievement-grid" id="lockedGrid"></div>
+        </section>
+    </main>
+
+    <script>
+        function formatDate(value) {
+            if (!value) {
+                return "";
+            }
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? "" : date.toLocaleString();
+        }
+
+        function renderAchievementCard(item, unlocked) {
+            const article = document.createElement("article");
+            article.className = "achievement-card " + (unlocked ? "unlocked" : "locked");
+            article.innerHTML =
+                "<div class='achievement-points'>" + item.points + " pts</div>" +
+                "<h3>" + item.name + "</h3>" +
+                "<p>" + item.description + "</p>" +
+                (unlocked && item.unlocked_at ? "<div class='achievement-date'>Unlocked: " + formatDate(item.unlocked_at) + "</div>" : "");
+            return article;
+        }
+
+        function renderList(containerId, items, unlocked) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = "";
+
+            if (!items.length) {
+                const empty = document.createElement("div");
+                empty.className = "empty-state";
+                empty.textContent = unlocked ? "No badges unlocked yet. Start using the chatbot features to earn some." : "No locked badges found.";
+                container.appendChild(empty);
+                return;
+            }
+
+            items.forEach((item) => {
+                container.appendChild(renderAchievementCard(item, unlocked));
+            });
+        }
+
+        async function loadAchievements() {
+            try {
+                const [achievementResponse, statsResponse] = await Promise.all([
+                    fetch("/get-achievements"),
+                    fetch("/get-achievement-stats")
+                ]);
+
+                const achievementData = await achievementResponse.json();
+                const statsData = await statsResponse.json();
+
+                const unlocked = achievementData.achieved || [];
+                const locked = achievementData.locked || [];
+                const total = unlocked.length + locked.length;
+                const progress = Math.round(achievementData.progress_percentage || 0);
+
+                document.getElementById("unlockedValue").textContent = achievementData.total_unlocked || unlocked.length;
+                document.getElementById("totalValue").textContent = total;
+                document.getElementById("pointsValue").textContent = achievementData.total_points || 0;
+                document.getElementById("rankValue").textContent = statsData.rank || "-";
+                document.getElementById("progressCopy").textContent = progress + "% of all achievements unlocked";
+                document.getElementById("progressFill").style.width = progress + "%";
+
+                renderList("unlockedGrid", unlocked, true);
+                renderList("lockedGrid", locked, false);
+            } catch (error) {
+                document.getElementById("progressCopy").textContent = "Could not load achievement data right now.";
+                renderList("unlockedGrid", [], true);
+                renderList("lockedGrid", [], false);
+            }
+        }
+
+        loadAchievements();
+    </script>
+</body>
+</html>
